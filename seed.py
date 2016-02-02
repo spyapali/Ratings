@@ -44,15 +44,12 @@ def load_movies():
     # we won't be trying to add duplicate users
     Movie.query.delete()
 
-    # Read u.user file and insert data
+    # Read u.item file and insert data
     for row in open("seed_data/u.item"):
         row = row.rstrip().split("|")
-        movie_id = row[0]
-        title = row[1]
+        movie_id, title, released_str, imdb_url = row[:4]        
         title = title[:-7]
-        imdb_url = row[4]
-        released_str = row[2]
-        
+       
         if released_str:
             released_at = datetime.strptime(released_str, "%d-%b-%Y")
         else:
@@ -77,9 +74,9 @@ def load_ratings():
 
     # Delete all rows in table, so if we need to run this a second time,
     # we won't be trying to add duplicate users
-    Movie.query.delete()
+    Rating.query.delete()
 
-    # Read u.user file and insert data
+    # Read u.data file and insert data
     for row in open("seed_data/u.data"):
         row = row.rstrip()
         user_id, movie_id, score, timestamp = row.split("\t")
@@ -93,7 +90,6 @@ def load_ratings():
 
     # Once we're done, we should commit our work
     db.session.commit()
-
 
 
 def set_val_user_id():
