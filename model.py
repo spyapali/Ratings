@@ -23,6 +23,11 @@ class User(db.Model):
     age = db.Column(db.Integer, nullable=True)
     zipcode = db.Column(db.String(15), nullable=True)
 
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<User user_id=%d email=%s>" % (self.user_id, self.email)
+
 
 # Put your Movie and Rating model classes here.
 
@@ -36,6 +41,11 @@ class Movie(db.Model):
     released_at = db.Column(db.DateTime, nullable=False)
     imdb_url = db.Column(db.String(64), nullable=False)
 
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Movie movie_id=%d title=%s>" % (self.movie_id, self.title)
+
 
 class Rating(db.Model):
     """Rating of ratings website."""
@@ -47,6 +57,12 @@ class Rating(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     score = db.Column(db.Integer, nullable=False)
    
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Rating rating_id=%d score=%d>" % (self.rating_id, self.score)
+
+
 ##############################################################################
 # Helper functions
 

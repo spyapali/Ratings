@@ -2,8 +2,9 @@
 
 from sqlalchemy import func
 from model import User
-# from model import Rating
-# from model import Movie
+from model import Movie
+from model import Rating
+from datetime import datetime
 
 from model import connect_to_db, db
 from server import app
@@ -37,9 +38,62 @@ def load_users():
 def load_movies():
     """Load movies from u.item into database."""
 
+    print "Movies"
+
+    # Delete all rows in table, so if we need to run this a second time,
+    # we won't be trying to add duplicate users
+    Movie.query.delete()
+
+    # Read u.user file and insert data
+    for row in open("seed_data/u.item"):
+        row = row.rstrip().split("|")
+        movie_id = row[0]
+        title = row[1]
+        title = title[:-7]
+        imdb_url = row[4]
+        released_str = row[2]
+        
+        if released_str:
+            released_at = datetime.strptime(released_str, "%d-%b-%Y")
+        else:
+            released_at = None
+
+        movie = Movie(movie_id=movie_id,
+                      title=title,
+                      released_at=released_at,
+                      imdb_url=imdb_url)
+
+        # We need to add to the session or it won't ever be stored
+        db.session.add(movie)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
 
 def load_ratings():
     """Load ratings from u.data into database."""
+
+    print "Ratings"
+
+    # Delete all rows in table, so if we need to run this a second time,
+    # we won't be trying to add duplicate users
+    Movie.query.delete()
+
+    # Read u.user file and insert data
+    for row in open("seed_data/u.data"):
+        row = row.rstrip()
+        user_id, movie_id, score, timestamp = row.split("\t")
+
+        rating = Rating(movie_id=movie_id,
+                        user_id=user_id,
+                        score=score)
+
+        # We need to add to the session or it won't ever be stored
+        db.session.add(rating)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
 
 
 def set_val_user_id():
