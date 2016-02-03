@@ -40,23 +40,61 @@ def show_login_form():
     return render_template("login.html")
 
 
-@app.route("/process_login", methods=["POST"])
+@app.route("/process-login", methods=["POST"])
 def process_user_login():
-    """Log in existing users, otherwise add new user."""
+    """Log in existing users, otherwise redirect to sign up page."""
 
     # EXISTING USERS
     # adding userid to session. 
     # Redirect back to homepage, with flash message saying "logged in"
     # Logged out route is flash message, removing userid from session. 
-    username = request.form.get("username")
+    email = request.form.get("email")
     password = request.form.get("password")
-    user = User.query.filter_by(email=username).one()   # naming variables username vs. email?
-    user.user_id
+    
+    # If user is found in database (TRUE), add to sesssion, redirect to homepage
+    # Else, add user to database, add to session, redirect to homepage
+    user = User.query.filter_by(email=email, password=password).first()
+    if user:
+        user_id = user.user_id
+        # print "user_id: %d" % (user_id)
+        session[user_id] = True
+        flash("Logged In")
+        return redirect("/")
+    else:
+        flash("Sorry, you're not a registered user. Please sign up.")
+        return redirect("/sign-up-form")
 
+        
+@app.route("/sign-up-form")
+def show_sign_up_form():
+    """Show sign up form for new users."""
+
+    return render_template("sign_up_form.html")
+
+    
+@app.route("/sign-up", methods=["POST"])
+def sign_up_new_user():
+    """Add a new user to the database and session."""
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+    age = int(request.form.get("age"))
+    zipcode = request.form.get("zipcode")
+    
+    new_user = User(email=email, password=password, age=age, zipcode=zipcode)
+    # print "new_user: %s" % (new_user)
+    db.session.add(new_user)
+    db.session.commit()
+    new_user_id = new_user.user_id
+    # print "new_user_id: %d" % (new_user_id)
+    session[new_user_id] = True 
 
     # NEW USERS
     # check if user with username exists in database (should not)
     # add user to database
+
+    return redirect("/")
+
 
 
 if __name__ == "__main__":
