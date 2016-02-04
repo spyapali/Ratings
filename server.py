@@ -44,20 +44,17 @@ def show_login_form():
 def process_user_login():
     """Log in existing users, otherwise redirect to sign up page."""
 
-    # EXISTING USERS
-    # adding userid to session. 
-    # Redirect back to homepage, with flash message saying "logged in"
-    # Logged out route is flash message, removing userid from session. 
     email = request.form.get("email")
     password = request.form.get("password")
     
-    # If user is found in database (TRUE), add to sesssion, redirect to homepage
-    # Else, add user to database, add to session, redirect to homepage
+    # Grab the user object that matches the email and password values.
     user = User.query.filter_by(email=email, password=password).first()
+
+    # If the user object exists, then add the user_id to the session (logged in).
+    # Otherwise, redirect to sign up form to create a new user account.
     if user:
         user_id = user.user_id
-        # print "user_id: %d" % (user_id)
-        session[user_id] = True
+        session["user_id"] = user_id
         flash("Logged In")
         return redirect("/")
     else:
@@ -81,20 +78,20 @@ def sign_up_new_user():
     age = int(request.form.get("age"))
     zipcode = request.form.get("zipcode")
     
+    # Creating new user in our database based on email, password, age, and zipcode. 
     new_user = User(email=email, password=password, age=age, zipcode=zipcode)
-    # print "new_user: %s" % (new_user)
     db.session.add(new_user)
     db.session.commit()
-    new_user_id = new_user.user_id
-    # print "new_user_id: %d" % (new_user_id)
-    session[new_user_id] = True 
 
-    # NEW USERS
-    # check if user with username exists in database (should not)
-    # add user to database
+    new_user_id = new_user.user_id
+    # Add the new user to the session. 
+    session["user_id"] = new_user_id
+    flash("Thank you. Your account has been created.")  
 
     return redirect("/")
 
+
+    
 
 
 if __name__ == "__main__":
