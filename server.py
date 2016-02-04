@@ -30,7 +30,31 @@ def user_list():
     """Show list of users."""
 
     users = User.query.all()
+
     return render_template("user_list.html", users=users)
+
+
+@app.route("/users/<user_id>")
+def show_user_details(user_id):
+    """Show user details."""
+
+    user = User.query.get(user_id)
+
+    return render_template("user_details.html",
+                            user=user)
+
+
+@app.route("/movies")
+def movie_list():
+    """Show list of movies."""
+
+    movies = Movie.query.all()
+
+    return render_template("movie_list.html", movies=movies)
+
+
+# @app.route("/movies/<movie_id>")
+# def movie
 
 
 @app.route("/login")
@@ -56,7 +80,8 @@ def process_user_login():
         user_id = user.user_id
         session["user_id"] = user_id
         flash("Logged In")
-        return redirect("/user-detail")
+        user_details = "/users/%d" % (user_id)
+        return redirect(user_details)
     else:
         flash("Sorry, you're not a registered user. Please sign up.")
         return redirect("/sign-up-form")
@@ -88,7 +113,8 @@ def sign_up_new_user():
     session["user_id"] = new_user_id
     flash("Thank you. Your account has been created.")  
 
-    return redirect("/")
+    new_user_details = "/users/%d" % (new_user_id)
+    return redirect(new_user_details)
 
 
 @app.route("/logout")
@@ -99,13 +125,6 @@ def log_out_user():
     flash("Logged out")
     return redirect("/")
 
-
-# route should be "/users/{{ user.user_id }}" when click on user from user list
-@app.route("/user-detail")
-def show_user_details():
-    """Show user details."""
-
-    return render_template("user-detail.html")
 
 
 if __name__ == "__main__":
