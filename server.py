@@ -56,7 +56,7 @@ def process_user_login():
         user_id = user.user_id
         session["user_id"] = user_id
         flash("Logged In")
-        return redirect("/")
+        return redirect("/user-detail")
     else:
         flash("Sorry, you're not a registered user. Please sign up.")
         return redirect("/sign-up-form")
@@ -91,7 +91,21 @@ def sign_up_new_user():
     return redirect("/")
 
 
-    
+@app.route("/logout")
+def log_out_user():
+    """Logging out user and redirecting to homepage."""
+
+    del session["user_id"]
+    flash("Logged out")
+    return redirect("/")
+
+
+# route should be "/users/{{ user.user_id }}" when click on user from user list
+@app.route("/user-detail")
+def show_user_details():
+    """Show user details."""
+
+    return render_template("user-detail.html")
 
 
 if __name__ == "__main__":
