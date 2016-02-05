@@ -34,7 +34,7 @@ def user_list():
     return render_template("user_list.html", users=users)
 
 
-@app.route("/users/<user_id>")
+@app.route("/users/<int:user_id>")
 def show_user_details(user_id):
     """Show user details."""
 
@@ -48,13 +48,52 @@ def show_user_details(user_id):
 def movie_list():
     """Show list of movies."""
 
-    movies = Movie.query.all()
+    movies = Movie.query.order_by(Movie.title).all()
 
     return render_template("movie_list.html", movies=movies)
 
 
-# @app.route("/movies/<movie_id>")
-# def movie
+@app.route("/movies/<int:movie_id>")
+def show_movie_details(movie_id):
+    """Show movie details."""
+
+    movie = Movie.query.get(movie_id)
+
+    return render_template("movie_details.html",
+                            movie=movie)
+
+
+@app.route("/movies/<int:movie_id>/show-rating-form")
+def show_rating_form(movie_id):
+    """Show rating form to add or update movie rating."""
+
+    # If user is logged in, render rating_form.html.
+    # Otherwise, redirect to login page.
+    
+    movie = Movie.query.get(movie_id)    
+
+    if session:
+        return render_template("rating_form.html",
+                                movie=movie)
+    else:
+        flash("Please login to add or update a movie rating.")
+        return redirect("/login")
+
+
+@app.route("/movies/<int:movie_id>/new-update-rating", methods=["POST"])
+def process_rating(movie_id):
+    """Update or add new user rating."""
+
+    user_id = session.get("user_id")
+    movie = Movie.query.get(movie_id)
+
+    for rating in movie.ratings:
+        if rating.user.user_id == user_id:
+            # Update rating
+        else:
+            # Add rating
+            new_rating = request.form.get("rating")
+
 
 
 @app.route("/login")
