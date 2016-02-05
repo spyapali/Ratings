@@ -85,15 +85,31 @@ def process_rating(movie_id):
     """Update or add new user rating."""
 
     user_id = session.get("user_id")
-    movie = Movie.query.get(movie_id)
+    score = request.form.get("rating")
 
-    for rating in movie.ratings:
-        if rating.user.user_id == user_id:
-            # Update rating
-        else:
-            # Add rating
-            new_rating = request.form.get("rating")
+    rating = Rating.query.filter_by(user_id=user_id, movie_id=movie_id)
+    
+    if rating:
+        # Update rating        
+        rating.score = score
+        # print "SCORE", score
+        # print "RATING.SCORE", rating.score
+        ################################################################
+        # Flash message works. score & rating.score is correct
+        # But score is not updating on movie details page.
+        flash("Thank you. Your rating has been updated for this movie.")
+        return redirect("/movies")
+    else:
+        # Add rating
+        rating = Rating(user_id=user_id, 
+                        movie_id=movie_id,
+                        score=score)
+        
+        db.session.add(rating)
+        db.session.commit()
 
+        flash("Thank you. Your rating has been added.")
+        return redirect("/movies")
 
 
 @app.route("/login")
