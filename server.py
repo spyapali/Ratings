@@ -93,6 +93,7 @@ def process_rating(movie_id):
         # Update rating        
         rating.score = score
         flash("Thank you. Your rating has been updated for this movie.")
+        return redirect("/movies/%s" % movie_id)
     else:
         # Add rating
         rating = Rating(user_id=user_id, 
